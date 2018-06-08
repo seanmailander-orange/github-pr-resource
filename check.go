@@ -109,13 +109,17 @@ Loop:
 
 // GetVersionStringFromPullRequest returns string-serialized representation of latest commit in a PR
 func GetVersionStringFromPullRequest(pull *PullRequest) string {
-	return strconv.Itoa(pull.Number) + ":" + strconv.FormatInt(pull.Tip.CommittedDate.Time.UnixNano(), 10)
+	return strconv.Itoa(pull.Number) + ":" + strconv.FormatInt(pull.Tip.CommittedDate.Time.Unix(), 10)
 }
 
 // ExtractVersionFromVersionString takes a string-formatted pair of PR#:CommittedDate and decodes them
 func ExtractVersionFromVersionString(alreadySeenPair string) AlreadySeenVersion {
 	var pairs = strings.Split(alreadySeenPair, ":")
-	var committedDate, _ = time.Parse(time.UnixDate, pairs[1])
+	committedDateAsInt, err := strconv.ParseInt(pairs[1], 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	var committedDate = time.Unix(committedDateAsInt, 0)
 	return AlreadySeenVersion{PR: pairs[0], committedDate: committedDate}
 }
 
@@ -141,7 +145,7 @@ func AboveTheFold(pullRequestVersion string, alreadySeen string) bool {
 		var thisPairVersion = ExtractVersionFromVersionString(pair)
 		if thisPairVersion.PR == pullRequest.PR {
 			isFoundInPairs = true
-			if thisPairVersion.committedDate.Before(pullRequest.committedDate) {
+			if pullRequest.committedDate.After(thisPairVersion.committedDate) {
 				isAboveTheFold = true
 			}
 		}
