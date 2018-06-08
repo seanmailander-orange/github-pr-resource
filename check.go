@@ -107,21 +107,16 @@ Loop:
 	return response, nil
 }
 
-type alreadySeenVersion struct {
-	PR            string
-	committedDate time.Time
-}
-
 // GetVersionStringFromPullRequest returns string-serialized representation of latest commit in a PR
 func GetVersionStringFromPullRequest(pull *PullRequest) string {
 	return strconv.Itoa(pull.Number) + ":" + strconv.FormatInt(pull.Tip.CommittedDate.Time.UnixNano(), 10)
 }
 
 // ExtractVersionFromVersionString takes a string-formatted pair of PR#:CommittedDate and decodes them
-func ExtractVersionFromVersionString(alreadySeenPair string) alreadySeenVersion {
+func ExtractVersionFromVersionString(alreadySeenPair string) AlreadySeenVersion {
 	var pairs = strings.Split(alreadySeenPair, ":")
 	var committedDate, _ = time.Parse(time.UnixDate, pairs[1])
-	return alreadySeenVersion{PR: pairs[0], committedDate: committedDate}
+	return AlreadySeenVersion{PR: pairs[0], committedDate: committedDate}
 }
 
 // GenerateVersion returns a string-formatted array of PR#:CommittedDate
