@@ -39,7 +39,7 @@ var (
 		},
 		{
 			PullRequestObject: createTestPR(3),
-			Tip:               createTestCommit(5, false),
+			Tip:               createTestCommit(2, false),
 		},
 		{
 			PullRequestObject: createTestPR(4),
@@ -96,13 +96,12 @@ func TestCheck(t *testing.T) {
 			files:        [][]string{},
 			expected: resource.CheckResponse{
 				resource.NewVersion(testPullRequests[3], resource.GenerateVersion(testPullRequests[1:4])),
-				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[1:4])),
 				resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:4])),
 			},
 		},
 
 		{
-			description: "check will only return versions that match the specified paths",
+			description: "check will only return versions that match the specified paths and are newer",
 			source: resource.Source{
 				Repository:  "itsdalmo/test-repository",
 				AccessToken: "oauthtoken",
@@ -117,7 +116,6 @@ func TestCheck(t *testing.T) {
 			},
 			expected: resource.CheckResponse{
 				resource.NewVersion(testPullRequests[3], resource.GenerateVersion(testPullRequests[2:])),
-				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[2:])),
 			},
 		},
 

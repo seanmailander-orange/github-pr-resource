@@ -86,8 +86,9 @@ Loop:
 			alreadySeenPullsToHide = append(alreadySeenPullsToHide, p)
 		}
 	}
-
-	var versionsJustSeen = GenerateVersion(append(newPullsToReturn, alreadySeenPullsToHide...))
+	var combinedVersions Pulls = append(newPullsToReturn, alreadySeenPullsToHide...)
+	sort.Sort(combinedVersions)
+	var versionsJustSeen = GenerateVersion(combinedVersions)
 
 	// Add "above-the-fold" with new alreadySeen version strings
 	for _, p := range newPullsToReturn {
@@ -210,5 +211,18 @@ func (r CheckResponse) Less(i, j int) bool {
 }
 
 func (r CheckResponse) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+// Pulls ...
+type Pulls []*PullRequest
+
+func (r Pulls) Len() int {
+	return len(r)
+}
+func (r Pulls) Less(i, j int) bool {
+	return r[j].Number > r[i].Number
+}
+func (r Pulls) Swap(i, j int) {
 	r[i], r[j] = r[j], r[i]
 }
