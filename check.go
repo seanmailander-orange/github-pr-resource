@@ -133,6 +133,7 @@ func GenerateVersion(pulls []*PullRequest) string {
 	return strings.Join(pairs, ",")
 }
 
+// AboveTheFold returns a boolean indicating if a given pull request commit is newer than any commits already seen for that pull request
 func AboveTheFold(pullRequestVersion string, alreadySeen string) bool {
 	if !strings.Contains(alreadySeen, ":") {
 		return true
