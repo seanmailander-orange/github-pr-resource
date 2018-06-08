@@ -147,6 +147,7 @@ func TestCheck(t *testing.T) {
 				gomock.InOrder(
 					github.EXPECT().ListModifiedFiles(gomock.Any()).Times(1).Return(tc.files[0], nil),
 					github.EXPECT().ListModifiedFiles(gomock.Any()).Times(1).Return(tc.files[1], nil),
+					github.EXPECT().ListModifiedFiles(gomock.Any()).Times(1).Return(tc.files[2], nil),
 				)
 			}
 
