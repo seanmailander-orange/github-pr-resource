@@ -97,7 +97,7 @@ Loop:
 	sort.Sort(response)
 
 	// If there are no new but an old version = return the old
-	if len(response) == 0 && request.Version.PR != "" {
+	if len(response) == 0 && request.Version.AlreadySeen != "" {
 		response = append(response, request.Version)
 	}
 	// If there are new versions and no previous = return just the latest
