@@ -53,19 +53,19 @@ func TestCheck(t *testing.T) {
 			},
 		},
 
-		// {
-		// 	description: "check returns the previous version when its still latest",
-		// 	source: resource.Source{
-		// 		Repository:  "itsdalmo/test-repository",
-		// 		AccessToken: "oauthtoken",
-		// 	},
-		// 	version:      resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
-		// 	pullRequests: testPullRequests,
-		// 	files:        [][]string{},
-		// 	expected: resource.CheckResponse{
-		// 		resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
-		// 	},
-		// },
+		{
+			description: "check returns the previous version when its still latest",
+			source: resource.Source{
+				Repository:  "itsdalmo/test-repository",
+				AccessToken: "oauthtoken",
+			},
+			version:      resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
+			pullRequests: testPullRequests,
+			files:        [][]string{},
+			expected: resource.CheckResponse{
+				resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
+			},
+		},
 
 		{
 			description: "check returns all new versions since the last",
@@ -77,61 +77,61 @@ func TestCheck(t *testing.T) {
 			pullRequests: testPullRequests,
 			files:        [][]string{},
 			expected: resource.CheckResponse{
-				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[1:3])),
-				resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:3])),
+				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[1:])),
+				resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
 			},
 		},
 
-		// {
-		// 	description: "check will only return versions that match the specified paths",
-		// 	source: resource.Source{
-		// 		Repository:  "itsdalmo/test-repository",
-		// 		AccessToken: "oauthtoken",
-		// 		Paths:       []string{"terraform/*/*.tf", "terraform/*/*/*.tf"},
-		// 	},
-		// 	version:      resource.NewVersion(testPullRequests[3], "nopenopenope"),
-		// 	pullRequests: testPullRequests,
-		// 	files: [][]string{
-		// 		{"README.md", "travis.yml"},
-		// 		{"terraform/modules/ecs/main.tf", "README.md"},
-		// 		{"terraform/modules/variables.tf", "travis.yml"},
-		// 	},
-		// 	expected: resource.CheckResponse{
-		// 		resource.NewVersion(testPullRequests[2], "nopenopenope"),
-		// 	},
-		// },
+		{
+			description: "check will only return versions that match the specified paths",
+			source: resource.Source{
+				Repository:  "itsdalmo/test-repository",
+				AccessToken: "oauthtoken",
+				Paths:       []string{"terraform/*/*.tf", "terraform/*/*/*.tf"},
+			},
+			version:      resource.NewVersion(testPullRequests[3], resource.GenerateVersion(testPullRequests[3:])),
+			pullRequests: testPullRequests,
+			files: [][]string{
+				{"README.md", "travis.yml"},
+				{"terraform/modules/ecs/main.tf", "README.md"},
+				{"terraform/modules/variables.tf", "travis.yml"},
+			},
+			expected: resource.CheckResponse{
+				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[2:])),
+			},
+		},
 
-		// {
-		// 	description: "check will skip versions which only match the ignore paths",
-		// 	source: resource.Source{
-		// 		Repository:  "itsdalmo/test-repository",
-		// 		AccessToken: "oauthtoken",
-		// 		IgnorePaths: []string{"*.md", "*.yml"},
-		// 	},
-		// 	version:      resource.NewVersion(testPullRequests[3], "nopenopenope"),
-		// 	pullRequests: testPullRequests,
-		// 	files: [][]string{
-		// 		{"README.md", "travis.yml"},
-		// 		{"terraform/modules/ecs/main.tf", "README.md"},
-		// 		{"terraform/modules/variables.tf", "travis.yml"},
-		// 	},
-		// 	expected: resource.CheckResponse{
-		// 		resource.NewVersion(testPullRequests[2], "nopenopenope"),
-		// 	},
-		// },
-		// {
-		// 	description: "check correctly ignores [skip ci] when specified",
-		// 	source: resource.Source{
-		// 		Repository:    "itsdalmo/test-repository",
-		// 		AccessToken:   "oauthtoken",
-		// 		DisableCISkip: "true",
-		// 	},
-		// 	version:      resource.NewVersion(testPullRequests[1], "nopenopenope"),
-		// 	pullRequests: testPullRequests,
-		// 	expected: resource.CheckResponse{
-		// 		resource.NewVersion(testPullRequests[0], "nopenopenope"),
-		// 	},
-		// },
+		{
+			description: "check will skip versions which only match the ignore paths",
+			source: resource.Source{
+				Repository:  "itsdalmo/test-repository",
+				AccessToken: "oauthtoken",
+				IgnorePaths: []string{"*.md", "*.yml"},
+			},
+			version:      resource.NewVersion(testPullRequests[3], resource.GenerateVersion(testPullRequests[3:])),
+			pullRequests: testPullRequests,
+			files: [][]string{
+				{"README.md", "travis.yml"},
+				{"terraform/modules/ecs/main.tf", "README.md"},
+				{"terraform/modules/variables.tf", "travis.yml"},
+			},
+			expected: resource.CheckResponse{
+				resource.NewVersion(testPullRequests[2], resource.GenerateVersion(testPullRequests[2:])),
+			},
+		},
+		{
+			description: "check correctly ignores [skip ci] when specified",
+			source: resource.Source{
+				Repository:    "itsdalmo/test-repository",
+				AccessToken:   "oauthtoken",
+				DisableCISkip: "true",
+			},
+			version:      resource.NewVersion(testPullRequests[1], resource.GenerateVersion(testPullRequests[1:])),
+			pullRequests: testPullRequests,
+			expected: resource.CheckResponse{
+				resource.NewVersion(testPullRequests[0], resource.GenerateVersion(testPullRequests)),
+			},
+		},
 	}
 
 	for _, tc := range tests {

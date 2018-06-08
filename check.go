@@ -1,7 +1,6 @@
 package resource
 
 import (
-	"log"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -28,6 +27,7 @@ func Check(request CheckRequest, manager Github) (CheckResponse, error) {
 	}
 
 	var newPullsToReturn []*PullRequest
+	var alreadySeenPullsToHide []*PullRequest
 
 Loop:
 	for _, p := range pulls {
@@ -79,14 +79,15 @@ Loop:
 			}
 		}
 
-		// TODO: determine above/below the fold
+		// Determine above/below the fold
 		if AboveTheFold(GetVersionStringFromPullRequest(p), request.Version.AlreadySeen) {
 			newPullsToReturn = append(newPullsToReturn, p)
+		} else {
+			alreadySeenPullsToHide = append(alreadySeenPullsToHide, p)
 		}
-		// alreadySeenPullsToReturn = append(alreadySeenPullsToReturn, p)
 	}
 
-	var versionsJustSeen = GenerateVersion(newPullsToReturn)
+	var versionsJustSeen = GenerateVersion(append(newPullsToReturn, alreadySeenPullsToHide...))
 
 	// Add "above-the-fold" with new alreadySeen version strings
 	for _, p := range newPullsToReturn {
@@ -116,6 +117,13 @@ func GetVersionStringFromPullRequest(pull *PullRequest) string {
 	return strconv.Itoa(pull.Number) + ":" + strconv.FormatInt(pull.Tip.CommittedDate.Time.UnixNano(), 10)
 }
 
+// ExtractVersionFromVersionString takes a string-formatted pair of PR#:CommittedDate and decodes them
+func ExtractVersionFromVersionString(alreadySeenPair string) alreadySeenVersion {
+	var pairs = strings.Split(alreadySeenPair, ":")
+	var committedDate, _ = time.Parse(time.UnixDate, pairs[1])
+	return alreadySeenVersion{PR: pairs[0], committedDate: committedDate}
+}
+
 // GenerateVersion returns a string-formatted array of PR#:CommittedDate
 func GenerateVersion(pulls []*PullRequest) string {
 	var pairs []string
@@ -125,36 +133,24 @@ func GenerateVersion(pulls []*PullRequest) string {
 	return strings.Join(pairs, ",")
 }
 
-func ExtractVersion(alreadySeenPair string) alreadySeenVersion {
-	log.Printf("extracting %v", alreadySeenPair)
-	var pairs = strings.Split(alreadySeenPair, ":")
-	var committedDate, _ = time.Parse(time.UnixDate, pairs[1])
-	return alreadySeenVersion{PR: pairs[0], committedDate: committedDate}
-}
-
 func AboveTheFold(pullRequestVersion string, alreadySeen string) bool {
-	log.Printf("Check the fold? %v : %v", pullRequestVersion, alreadySeen)
 	if !strings.Contains(alreadySeen, ":") {
-		log.Printf("No pairs, must be above the fold %v", pullRequestVersion)
 		return true
 	}
 	var pairs = strings.Split(alreadySeen, ",")
 	var isAboveTheFold = false
 	var isFoundInPairs = false
-	var pullRequest = ExtractVersion(pullRequestVersion)
+	var pullRequest = ExtractVersionFromVersionString(pullRequestVersion)
 	for _, pair := range pairs {
-		log.Printf("Checking pair %v", pair)
-		var thisPairVersion = ExtractVersion(pair)
+		var thisPairVersion = ExtractVersionFromVersionString(pair)
 		if thisPairVersion.PR == pullRequest.PR {
 			isFoundInPairs = true
 			if thisPairVersion.committedDate.Before(pullRequest.committedDate) {
-				log.Printf("Pull request is newer commit %v", pullRequest.PR)
 				isAboveTheFold = true
 			}
 		}
 	}
 	if !isFoundInPairs {
-		log.Printf("Pull request is not in pairs, so Above the fold %v", pullRequest.PR)
 		isAboveTheFold = true
 	}
 	return isAboveTheFold
