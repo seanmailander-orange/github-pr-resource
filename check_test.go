@@ -11,28 +11,16 @@ import (
 
 var (
 	testPullRequests = []*resource.PullRequest{
-		createTestPR(1, true),
-		createTestPR(2, false),
-		createTestPR(3, false),
-		createTestPR(4, false),
+		createTestPR(1, 1, true),
+		createTestPR(2, 2, false),
+		createTestPR(3, 3, false),
+		createTestPR(4, 4, false),
 	}
 	testPreviousPullRequests = []*resource.PullRequest{
-		{
-			PullRequestObject: createTestPR(1),
-			Tip:               createTestCommit(3, true),
-		},
-		{
-			PullRequestObject: createTestPR(2),
-			Tip:               createTestCommit(4, false),
-		},
-		{
-			PullRequestObject: createTestPR(3),
-			Tip:               createTestCommit(2, false),
-		},
-		{
-			PullRequestObject: createTestPR(4),
-			Tip:               createTestCommit(6, false),
-		},
+		createTestPR(1, 3, true),
+		createTestPR(2, 4, false),
+		createTestPR(3, 2, false),
+		createTestPR(4, 6, false),
 	}
 )
 
