@@ -39,8 +39,8 @@ func TestGet(t *testing.T) {
 				CommittedDate: time.Time{},
 			},
 			parameters:     resource.GetParameters{},
-			pullRequest:    createTestPR(1, false),
-			versionString:  `{"pr":"pr1","commit":"commit1","committed":"0001-01-01T00:00:00Z"}`,
+			pullRequest:    createTestPR(1, 1, false),
+			versionString:  `{"pr":"pr1","commit":"commit1","committed":"0001-01-01T00:00:00Z","alreadyseen":""}`,
 			metadataString: `[{"name":"pr","value":"1"},{"name":"url","value":"pr1 url"},{"name":"head_sha","value":"oid1"},{"name":"base_sha","value":"sha"},{"name":"message","value":"commit message1"},{"name":"author","value":"login1"}]`,
 		},
 	}
@@ -90,9 +90,9 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func createTestPR(count int, skipCI bool) *resource.PullRequest {
+func createTestPR(count int, daysOld int, skipCI bool) *resource.PullRequest {
 	n := strconv.Itoa(count)
-	d := time.Now().AddDate(0, 0, -count)
+	d := time.Now().AddDate(0, 0, -daysOld)
 	m := fmt.Sprintf("commit message%s", n)
 	if skipCI {
 		m = "[skip ci]" + m
